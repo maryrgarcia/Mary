@@ -5,257 +5,225 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Royal Vending — Coaching & Training</title>
 
-  <!-- Google font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
 
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <!-- jsPDF for PDF export -->
+  <!-- jsPDF for PDF export (optional) -->
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-  <!-- Feather icons -->
+  <!-- feather icons -->
   <script src="https://unpkg.com/feather-icons"></script>
-
-  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">
-      <img src="" alt="" id="logo-img" style="display:none">
-      <div class="logo-text">Royal Vending</div>
+  <!-- LOGIN / REGISTER -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <h2>Royal Vending Portal</h2>
+
+      <div id="auth-forms">
+        <div id="signin-form">
+          <input id="email" placeholder="Email" />
+          <input id="password" type="password" placeholder="Password" />
+          <div class="auth-actions">
+            <button id="btnSignIn" class="btn accent">Sign in</button>
+            <button id="showSignup" class="btn">Create account</button>
+          </div>
+          <p id="authMessage" class="muted"></p>
+        </div>
+
+        <div id="signup-form" class="hidden">
+          <input id="su_name" placeholder="Full name" />
+          <input id="su_email" placeholder="Email" />
+          <input id="su_password" type="password" placeholder="Password" />
+          <label>Role:
+            <select id="su_role">
+              <option value="agent">Agent</option>
+              <option value="evaluator">Evaluator</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+          <div class="auth-actions">
+            <button id="btnSignUp" class="btn accent">Create account</button>
+            <button id="showSignin" class="btn">Back</button>
+          </div>
+          <p id="suMessage" class="muted"></p>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <nav class="nav">
-      <button class="nav-link active" data-page="dashboard">Dashboard</button>
-      <button class="nav-link" data-page="evaluations">Evaluations</button>
-      <button class="nav-link" data-page="coaching">Coaching Logs</button>
-      <button class="nav-link" data-page="reports">Reports</button>
-      <button class="nav-link" data-page="admin">Admin</button>
-    </nav>
-  </header>
-
-  <main class="container">
-
-    <!-- DASHBOARD -->
-    <section id="dashboard" class="page">
-      <h1>Dashboard</h1>
-
-      <div class="cards">
-        <div class="card">
-          <div class="card-title">Average Evaluation Score (this month)</div>
-          <div id="avg-score" class="card-value">—</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Total Coaching Sessions</div>
-          <div id="total-coaching" class="card-value">—</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Team Members Evaluated</div>
-          <div id="members-evaluated" class="card-value">—</div>
-        </div>
-        <div class="card">
-          <div class="card-title">Top Performing Skill Area</div>
-          <div id="top-skill" class="card-value">—</div>
-        </div>
+  <!-- APP -->
+  <div id="app" class="hidden">
+    <header class="site-header">
+      <div class="brand">
+        <div class="logo-text">Royal Vending</div>
       </div>
 
-      <div class="chart-card">
-        <div class="chart-header">
+      <nav class="nav">
+        <button class="nav-link active" data-page="dashboard">Dashboard</button>
+        <button class="nav-link" data-page="evaluations">Evaluations</button>
+        <button class="nav-link" data-page="coaching">Coaching Logs</button>
+        <button class="nav-link" data-page="reports">Reports</button>
+        <button class="nav-link" data-page="admin" id="adminTab">Admin</button>
+        <button id="logoutBtn" class="btn">Logout</button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <!-- Dashboard -->
+      <section id="dashboard" class="page">
+        <h1>Dashboard</h1>
+        <div class="cards">
+          <div class="card"><div class="card-title">Average Evaluation Score (this month)</div><div id="avg-score" class="card-value">—</div></div>
+          <div class="card"><div class="card-title">Total Coaching Sessions</div><div id="total-coaching" class="card-value">—</div></div>
+          <div class="card"><div class="card-title">Team Members Evaluated</div><div id="members-evaluated" class="card-value">—</div></div>
+          <div class="card"><div class="card-title">Top Performing Skill Area</div><div id="top-skill" class="card-value">—</div></div>
+        </div>
+        <div class="chart-card">
           <h2>Average Quality Scores Over Time</h2>
+          <canvas id="lineChart" height="120"></canvas>
         </div>
-        <canvas id="lineChart" height="120"></canvas>
-      </div>
-
-      <div class="quick-actions">
-        <button id="new-eval-btn" class="btn accent">+ New Evaluation</button>
-        <button id="new-coach-btn" class="btn">+ Add Coaching Log</button>
-        <button id="view-team" class="btn">View Team Performance</button>
-      </div>
-    </section>
-
-    <!-- EVALUATIONS -->
-    <section id="evaluations" class="page hidden">
-      <div class="page-header">
-        <h1>Evaluations</h1>
-        <div class="filter-row">
-          <select id="filter-member" class="input"> <option value="">All Members</option></select>
-          <input id="filter-month" type="month" class="input">
-          <select id="filter-evaluator" class="input"><option value="">All Evaluators</option></select>
-          <select id="filter-score" class="input"><option value="">All Scores</option><option value="0-2">0-2</option><option value="2-3.5">2-3.5</option><option value="3.5-5">3.5-5</option></select>
-          <input id="filter-search" placeholder="Search" class="input">
-          <button id="clear-filters" class="btn small">Clear</button>
+        <div class="quick-actions">
+          <button id="new-eval-btn" class="btn accent">+ New Evaluation</button>
+          <button id="new-coach-btn" class="btn">+ Add Coaching Log</button>
+          <button id="view-team" class="btn">View Team Performance</button>
         </div>
-        <button id="add-eval" class="btn accent">➕ Add New Evaluation</button>
-      </div>
+      </section>
 
-      <table class="table" id="eval-table">
-        <thead>
-          <tr>
-            <th>Team Member</th>
-            <th>Evaluator</th>
-            <th>Total Score</th>
-            <th>Key Strength</th>
-            <th>Area for Improvement</th>
-            <th>View</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <!-- COACHING LOGS -->
-    <section id="coaching" class="page hidden">
-      <div class="page-header">
-        <h1>Coaching Logs</h1>
-        <div class="filter-row">
-          <select id="coach-filter-member" class="input"> <option value="">All Members</option></select>
-          <input id="coach-date-from" type="date" class="input">
-          <input id="coach-date-to" type="date" class="input">
-          <select id="coach-filter-coach" class="input"><option value="">All Coaches</option></select>
-          <input id="coach-filter-topic" placeholder="Topic" class="input">
-          <button id="clear-coach-filters" class="btn small">Clear</button>
+      <!-- Evaluations -->
+      <section id="evaluations" class="page hidden">
+        <div class="page-header">
+          <h1>Evaluations</h1>
+          <div class="filter-row">
+            <select id="filter-member" class="input"><option value="">All Members</option></select>
+            <input id="filter-month" type="month" class="input">
+            <select id="filter-evaluator" class="input"><option value="">All Evaluators</option></select>
+            <select id="filter-score" class="input"><option value="">All Scores</option><option value="0-2">0-2</option><option value="2-3.5">2-3.5</option><option value="3.5-5">3.5-5</option></select>
+            <input id="filter-search" placeholder="Search" class="input">
+            <button id="clear-filters" class="btn small">Clear</button>
+          </div>
+          <button id="add-eval" class="btn accent">➕ Add New Evaluation</button>
         </div>
-        <button id="add-coach" class="btn accent">➕ Add Coaching Log</button>
-      </div>
 
-      <table class="table" id="coach-table">
-        <thead>
-          <tr>
-            <th>Team Member</th>
-            <th>Coach</th>
-            <th>Focus Area</th>
-            <th>Follow-up Date</th>
-            <th>Status</th>
-            <th>View</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
+        <table class="table" id="eval-table">
+          <thead><tr><th>Team Member</th><th>Evaluator</th><th>Total Score</th><th>Key Strength</th><th>Area for Improvement</th><th>View</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-    <!-- REPORTS -->
-    <section id="reports" class="page hidden">
-      <h1>Reports</h1>
-      <div class="report-actions">
-        <button id="export-csv" class="btn">⬇️ Download as Excel (CSV)</button>
-        <button id="export-pdf" class="btn">⬇️ Download as PDF</button>
-      </div>
-
-      <div class="charts-grid">
-        <div class="chart-card small">
-          <h3>Average Score by Skill</h3>
-          <canvas id="skillChart" height="140"></canvas>
+      <!-- Coaching -->
+      <section id="coaching" class="page hidden">
+        <div class="page-header">
+          <h1>Coaching Logs</h1>
+          <div class="filter-row">
+            <select id="coach-filter-member" class="input"><option value="">All Members</option></select>
+            <input id="coach-date-from" type="date" class="input">
+            <input id="coach-date-to" type="date" class="input">
+            <select id="coach-filter-coach" class="input"><option value="">All Coaches</option></select>
+            <input id="coach-filter-topic" placeholder="Topic" class="input">
+            <button id="clear-coach-filters" class="btn small">Clear</button>
+          </div>
+          <button id="add-coach" class="btn accent">➕ Add Coaching Log</button>
         </div>
-        <div class="chart-card small">
-          <h3>Coaching Sessions per Employee</h3>
-          <canvas id="coachChart" height="140"></canvas>
-        </div>
-      </div>
-    </section>
 
-    <!-- ADMIN -->
-    <section id="admin" class="page hidden">
-      <h1>Admin Settings</h1>
-      <div class="admin-columns">
-        <div class="admin-col">
-          <h3>Team Members</h3>
-          <ul id="team-list" class="list"></ul>
-          <input id="new-member-name" placeholder="New member name" class="input">
-          <button id="add-member-btn" class="btn small">Add Member</button>
-        </div>
-        <div class="admin-col">
-          <h3>Evaluators / Coaches</h3>
-          <ul id="users-list" class="list"></ul>
-          <input id="new-user-name" placeholder="New evaluator/coach" class="input">
-          <button id="add-user-btn" class="btn small">Add</button>
-        </div>
-        <div class="admin-col">
-          <h3>Evaluation Criteria</h3>
-          <p>Default criteria used in forms. To add / remove, edit below (simple list for now):</p>
-          <ul id="criteria-list" class="list"></ul>
-          <input id="new-criteria" placeholder="New criteria (e.g. Communication)" class="input">
-          <button id="add-criteria-btn" class="btn small">Add</button>
-        </div>
-      </div>
-    </section>
+        <table class="table" id="coach-table">
+          <thead><tr><th>Team Member</th><th>Coach</th><th>Focus Area</th><th>Follow-up Date</th><th>Status</th><th>View</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </section>
 
-  </main>
+      <!-- Reports -->
+      <section id="reports" class="page hidden">
+        <h1>Reports</h1>
+        <div class="report-actions">
+          <button id="export-csv" class="btn">⬇️ Download as CSV</button>
+          <button id="export-pdf" class="btn">⬇️ Download as PDF</button>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card small"><h3>Average Score by Skill</h3><canvas id="skillChart" height="140"></canvas></div>
+          <div class="chart-card small"><h3>Coaching Sessions per Employee</h3><canvas id="coachChart" height="140"></canvas></div>
+        </div>
+      </section>
 
-  <!-- Modals -->
+      <!-- Admin -->
+      <section id="admin" class="page hidden">
+        <h1>Admin Settings</h1>
+        <div class="admin-columns">
+          <div class="admin-col">
+            <h3>Team Members</h3>
+            <ul id="team-list" class="list"></ul>
+            <input id="new-member-name" placeholder="New member name" class="input">
+            <button id="add-member-btn" class="btn small">Add Member</button>
+          </div>
+
+          <div class="admin-col">
+            <h3>Users (Auth)</h3>
+            <ul id="users-list" class="list"></ul>
+            <input id="new-user-email" placeholder="Email" class="input">
+            <input id="new-user-name" placeholder="Display name" class="input">
+            <select id="new-user-role" class="input"><option value="agent">Agent</option><option value="evaluator">Evaluator</option><option value="admin">Admin</option></select>
+            <input id="new-user-password" placeholder="Password" class="input" type="password">
+            <button id="add-user-btn" class="btn small">Create User</button>
+            <p class="muted">Creating user will create an Auth account and a Firestore user doc with the chosen role.</p>
+          </div>
+
+          <div class="admin-col">
+            <h3>Evaluation Criteria</h3>
+            <ul id="criteria-list" class="list"></ul>
+            <input id="new-criteria" placeholder="New criteria (e.g. Communication)" class="input">
+            <button id="add-criteria-btn" class="btn small">Add</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modals / Overlays -->
   <div id="modal-overlay" class="modal-overlay hidden"></div>
 
   <!-- Add Evaluation Modal -->
   <div id="eval-modal" class="modal hidden">
-    <div class="modal-header"><h3>Add Evaluation</h3><button class="close-modal">&times;</button></div>
-    <div class="modal-body">
-      <form id="eval-form">
-        <label>Team Member
-          <select id="eval-member" required></select>
-        </label>
-        <label>Evaluation Date
-          <input id="eval-date" type="date" required>
-        </label>
-        <label>Evaluator
-          <select id="eval-evaluator" required></select>
-        </label>
-
-        <div class="skills-grid" id="skills-grid">
-          <!-- skill inputs added dynamically -->
-        </div>
-
-        <label>Comments / Notes
-          <textarea id="eval-comments" rows="3"></textarea>
-        </label>
-
-        <div class="score-row">
-          <div>Total Score: <span id="total-score">0</span></div>
-          <button type="submit" class="btn accent">Submit</button>
-        </div>
-      </form>
+    <div class="modal-inner">
+      <div class="modal-header"><h3>Add Evaluation</h3><button class="close-modal">&times;</button></div>
+      <div class="modal-body">
+        <form id="eval-form">
+          <label>Team Member<select id="eval-member" required></select></label>
+          <label>Evaluation Date<input id="eval-date" type="date" required></label>
+          <label>Evaluator<select id="eval-evaluator" required></select></label>
+          <div id="skills-grid" class="skills-grid"></div>
+          <label>Comments / Notes<textarea id="eval-comments" rows="3"></textarea></label>
+          <div class="score-row"><div>Total Score: <span id="total-score">0</span></div><button type="submit" class="btn accent">Submit</button></div>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- Add Coaching Modal -->
   <div id="coach-modal" class="modal hidden">
-    <div class="modal-header"><h3>Add Coaching Log</h3><button class="close-modal">&times;</button></div>
-    <div class="modal-body">
-      <form id="coach-form">
-        <label>Team Member
-          <select id="coach-member" required></select>
-        </label>
-        <label>Coach
-          <select id="coach-coach" required></select>
-        </label>
-        <label>Date of Session
-          <input id="coach-date" type="date" required>
-        </label>
-        <label>Key Topics Discussed
-          <textarea id="coach-topics" rows="2"></textarea>
-        </label>
-        <label>Action Items / Goals
-          <textarea id="coach-actions" rows="2"></textarea>
-        </label>
-        <label>Follow-Up Date
-          <input id="coach-followup" type="date">
-        </label>
-        <label>Attachments (optional)
-          <input id="coach-attachments" type="file" multiple>
-        </label>
+    <div class="modal-inner">
+      <div class="modal-header"><h3>Add Coaching Log</h3><button class="close-modal">&times;</button></div>
+      <div class="modal-body">
+        <form id="coach-form">
+          <label>Team Member<select id="coach-member" required></select></label>
+          <label>Coach<select id="coach-coach" required></select></label>
+          <label>Date of Session<input id="coach-date" type="date" required></label>
+          <label>Key Topics Discussed<textarea id="coach-topics" rows="2"></textarea></label>
+          <label>Action Items / Goals<textarea id="coach-actions" rows="2"></textarea></label>
+          <label>Follow-Up Date<input id="coach-followup" type="date"></label>
+          <label>Attachments (optional)<input id="coach-attachments" type="file" multiple></label>
 
-        <div class="ack-row">
-          <label><input id="ack-checkbox" type="checkbox"> Team member acknowledged</label>
-          <input id="ack-date" type="date" placeholder="Acknowledgement date" class="input">
-        </div>
+          <h4>Agent Acknowledgement (optional)</h4>
+          <label>Acknowledgement Text<textarea id="ack-text" rows="2"></textarea></label>
+          <label>Acknowledgement Date<input id="ack-date" type="date"></label>
 
-        <div class="score-row">
-          <button type="submit" class="btn accent">Submit</button>
-        </div>
-      </form>
+          <div class="score-row"><button type="submit" class="btn accent">Submit</button></div>
+        </form>
+      </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="app.js"></script>
   <script>feather.replace()</script>
 </body>
 </html>
