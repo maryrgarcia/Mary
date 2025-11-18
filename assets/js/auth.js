@@ -1,4 +1,4 @@
-const API_BASE = "https://script.google.com/macros/s/AKfycbxsuerdXI0qdT40PbJ1fyU_i0o6QqFAL53fKMD89i7BZNo8uVv_qrQ-5t-AXOgBkXZFuQ/exec";
+const API_BASE = "https://script.google.com/macros/s/AKfycbwvoK-o8GyoSLb6hBZwpm7u2CJy7HSUTxUtQuDOjyz0OqrzsYdkMw4YKh_XNXmAv2-_Pw/exec";
 
 // Safe API POST helper
 async function apiPost(endpoint, data = {}) {
