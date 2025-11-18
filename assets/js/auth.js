@@ -11,9 +11,12 @@ async function apiPost(endpoint, data = {}) {
     return response.json();
 }
 
-// Only attach login handler if login button exists
-const loginBtn = document.getElementById("loginBtn");
-if (loginBtn) {
+// Wait until DOM is fully loaded
+document.addEventListener("DOMContentLoaded", () => {
+    const loginBtn = document.getElementById("loginBtn");
+
+    if (!loginBtn) return; // Exit if no login button on this page
+
     loginBtn.addEventListener("click", async () => {
         const usernameField = document.getElementById("username");
         const passwordField = document.getElementById("password");
@@ -45,4 +48,4 @@ if (loginBtn) {
             alert("Cannot connect to server. Check Apps Script deployment.");
         }
     });
-}
+});
