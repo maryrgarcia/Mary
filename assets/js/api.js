@@ -1,4 +1,3 @@
-// ONLY place where API_BASE should exist
 const API_BASE = "https://script.google.com/macros/s/AKfycbwPDm0-pMqPOUfyP6OknUuhodt5xpYCdzfImIh-z5BQ3t24Wg02u9T_lY0zyV1uT6-u/exec";
 
 async function apiPost(endpoint, data = {}) {
