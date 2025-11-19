@@ -5,27 +5,82 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Royal Vending — Login</title>
   <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* Minimal clean style for login */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .auth-card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+    .auth-card h2 {
+      color: #0d2a5f; /* Royal blue */
+      margin-bottom: 1.5rem;
+    }
+    .auth-card input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .auth-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .btn {
+      background: #0d2a5f;
+      color: #fff;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #1440a3;
+    }
+    .muted {
+      color: #666;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+    }
+  </style>
 </head>
 <body>
   <div class="auth-screen">
     <div class="auth-card">
       <h2>Royal Vending Portal</h2>
 
-      <!-- CHANGED "email" to "username" -->
-      <input id="username" placeholder="Username" />
+      <!-- Inputs -->
+      <input id="username" placeholder="Username or Email" />
       <input id="password" type="password" placeholder="Password" />
 
+      <!-- Buttons -->
       <div class="auth-actions">
-        <!-- IDs updated to match auth.js -->
         <button id="loginBtn" class="btn">Sign In</button>
         <button id="createAccountBtn" class="btn">Create Account</button>
       </div>
 
-      <p id="authMessage" class="muted"></p>
+      <p id="authMessage" class="muted">Enter your credentials to log in.</p>
     </div>
   </div>
 
-  <script src="assets/js/api.js?v=100"></script>
-  <script src="assets/js/auth.js?v=100"></script>
+  <!-- JS -->
+  <script src="assets/js/api.js?v=101"></script>
+  <script src="assets/js/auth.js?v=101"></script>
 </body>
 </html>
