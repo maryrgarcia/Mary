@@ -1,4 +1,4 @@
-// api.js
+// Set to your Netlify function URL
 const API_BASE = "/.netlify/functions/proxy";
 
 async function apiPost(payload) {
@@ -8,9 +8,7 @@ async function apiPost(payload) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (err) {
     console.error("API POST error:", err);
     return { success: false, message: "Request failed" };
