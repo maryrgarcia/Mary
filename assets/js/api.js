@@ -1,16 +1,16 @@
-const API_BASE = "https://script.google.com/macros/s/AKfycbzrcp42cLgTrdttpe2XQds6RoLXJAcyHQUIItt2huaV6triutQGoaQpo2RwCiK_siIlSQ/exec";
+// api.js
+const API_BASE = "/.netlify/functions/proxy";
 
-async function apiPost(action, payload = {}) {
+async function apiPost(payload) {
   try {
     const response = await fetch(API_BASE, {
       method: "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ action, payload })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
-    return await response.json();
+
+    const data = await response.json();
+    return data;
   } catch (err) {
     console.error("API POST error:", err);
     return { success: false, message: "Request failed" };
