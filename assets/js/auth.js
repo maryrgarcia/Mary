@@ -11,11 +11,13 @@ loginBtn.addEventListener("click", async () => {
     return;
   }
 
-  const result = await apiPost({ action: "login", payload: { email, password } });
+  const result = await apiPost({
+    action: "login",
+    payload: { email, password }
+  });
 
   if (result.success) {
-    authMessage.textContent = "Login successful!";
-    // Role-based redirect
+    authMessage.textContent = "Login successful! Redirecting...";
     const role = result.user.role.toLowerCase();
     if (role === "admin") window.location.href = "dashboard.html";
     else if (role === "evaluator") window.location.href = "evaluations.html";
