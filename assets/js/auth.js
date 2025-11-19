@@ -11,35 +11,50 @@ async function apiPost(endpoint, data = {}) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("auth.js loaded");
+
     const loginBtn = document.getElementById("loginBtn");
-    if (!loginBtn) return;
+    const createBtn = document.getElementById("createAccountBtn");
 
-    loginBtn.addEventListener("click", async () => {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
+    if (loginBtn) {
+        loginBtn.addEventListener("click", async () => {
+            console.log("Login clicked");
 
-        if (!username || !password) {
-            alert("Please enter username and password");
-            return;
-        }
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
 
-        try {
-            const result = await apiPost("login", { username, password });
-
-            if (result.success) {
-                localStorage.setItem("user", JSON.stringify(result.user));
-
-                // Redirect based on role
-                if (result.user.role === "admin") window.location.href = "dashboard.html";
-                else if (result.user.role === "evaluator") window.location.href = "evaluations.html";
-                else if (result.user.role === "agent") window.location.href = "dashboard.html";
-                else alert("Unknown role");
-            } else {
-                alert(result.message);
+            if (!username || !password) {
+                alert("Please enter username and password");
+                return;
             }
-        } catch (err) {
-            console.error(err);
-            alert("Cannot connect to server. Check Apps Script deployment.");
-        }
-    });
+
+            try {
+                const result = await apiPost("login", { username, password });
+                console.log("Login result:", result);
+
+                if (result.success) {
+                    localStorage.setItem("user", JSON.stringify(result.user));
+
+                    if (result.user.role === "admin") {
+                        window.location.href = "dashboard.html";
+                    } else if (result.user.role === "evaluator") {
+                        window.location.href = "evaluations.html";
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+
+                } else {
+                    alert(result.message);
+                }
+            } catch (e) {
+                alert("Server error. Please try again.");
+            }
+        });
+    }
+
+    if (createBtn) {
+        createBtn.addEventListener("click", () => {
+            window.location.href = "signup.html";
+        });
+    }
 });
