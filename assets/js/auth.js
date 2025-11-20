@@ -1,32 +1,34 @@
-const loginBtn = document.getElementById("loginBtn");
-const signupBtn = document.getElementById("signupBtn");
-const authMessage = document.getElementById("authMessage");
+console.log("auth.js loaded");
 
-loginBtn.addEventListener("click", async () => {
-  const email = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+// LOGIN ---------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
 
-  if (!email || !password) {
-    authMessage.textContent = "Please enter username/email and password";
-    return;
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) {
+    loginBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const result = await apiPost("login", { email, password });
+      console.log("Login result:", result);
+
+      alert(result.message || (result.success ? "Login OK" : "Error"));
+    });
   }
 
-  const result = await apiPost({
-    action: "login",
-    payload: { email, password }
-  });
+  // SIGNUP -------------------------------------
+  const signupBtn = document.getElementById("signupBtn");
+  if (signupBtn) {
+    signupBtn.addEventListener("click", async () => {
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-  if (result.success) {
-    authMessage.textContent = "Login successful! Redirecting...";
-    const role = result.user.role.toLowerCase();
-    if (role === "admin") window.location.href = "dashboard.html";
-    else if (role === "evaluator") window.location.href = "evaluations.html";
-    else window.location.href = "agent.html";
-  } else {
-    authMessage.textContent = result.message;
+      const result = await apiPost("signup", { name, email, password });
+      console.log("Signup result:", result);
+
+      alert(result.message);
+    });
   }
-});
 
-signupBtn.addEventListener("click", () => {
-  window.location.href = "signup.html";
 });
