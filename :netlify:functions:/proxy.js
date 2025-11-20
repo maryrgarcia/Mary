@@ -11,7 +11,7 @@ exports.handler = async function(event, context) {
     const payload = JSON.parse(event.body);
 
     // Forward request to your Google Apps Script Web App
-    const response = await fetch("https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzrcp42cLgTrdttpe2XQds6RoLXJAcyHQUIItt2huaV6triutQGoaQpo2RwCiK_siIlSQ/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
