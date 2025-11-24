@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Evaluations — Royal Vending</title>
   <link rel="stylesheet" href="assets/css/style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="api-firebase.js"></script>
 </head>
 <body>
+
   <header>
     <img src="assets/images/logo.png" class="logo">
     <nav>
@@ -24,7 +21,12 @@
 
   <main>
     <h1>Evaluations</h1>
-    <button id="addEvalBtn">+ Add Evaluation</button>
+
+    <button id="addEvalBtn"
+      onclick="window.location.href='add-evaluation.html'">
+      + Add Evaluation
+    </button>
+
     <table id="evalTable" border="1">
       <thead>
         <tr>
@@ -39,21 +41,45 @@
     </table>
   </main>
 
-  <script>
-    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+  <!-- Firebase Modular Script -->
+  <script type="module">
+    import { listEvaluations, logoutUser } from './api-firebase.js';
+
+    // Redirect if not logged in
+    const user = sessionStorage.getItem('rvc_user');
+    if (!user) {
+      window.location.href = 'index.html';
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
       await logoutUser();
+      sessionStorage.removeItem('rvc_user');
       window.location.href = 'index.html';
     });
 
+    // Load evaluations from Firestore
     async function loadEvaluations() {
-      const list = await listEvaluations();
-      const tbody = document.querySelector('#evalTable tbody');
-      tbody.innerHTML = '';
-      list.forEach(e=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${e.member}</td><td>${e.evaluator}</td><td>${e.date}</td><td>${e.total}</td><td>${e.notes}</td>`;
-        tbody.appendChild(tr);
-      });
+      try {
+        const list = await listEvaluations();
+        const tbody = document.querySelector('#evalTable tbody');
+        tbody.innerHTML = '';
+
+        list.forEach(e => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${e.member || '-'}</td>
+            <td>${e.evaluator || '-'}</td>
+            <td>${e.date || '-'}</td>
+            <td>${e.total || '-'}</td>
+            <td>${e.notes || '-'}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error("Evaluation load error:", err);
+      }
     }
 
     loadEvaluations();
