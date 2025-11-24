@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Reports — Royal Vending</title>
   <link rel="stylesheet" href="assets/css/style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="api-firebase.js"></script>
 </head>
 <body>
+
   <header>
     <img src="assets/images/logo.png" class="logo">
     <nav>
@@ -24,16 +21,60 @@
 
   <main>
     <h1>Reports</h1>
-    <p>Export and visualize data (placeholders for charts)</p>
-    <button onclick="alert('Export Excel')">⬇️ Download Excel</button>
-    <button onclick="alert('Export PDF')">⬇️ Download PDF</button>
+
+    <p>Export and visualize data (charts and analytics coming soon)</p>
+
+    <button id="excelBtn">⬇️ Download Excel</button>
+    <button id="pdfBtn">⬇️ Download PDF</button>
+
+    <div id="chartsArea">
+      <!-- We will add real charts here later -->
+    </div>
   </main>
 
-  <script>
-    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-      await logoutUser();
+  <!-- Firebase Modular -->
+  <script type="module">
+    import { logoutUser, listEvaluations, listCoaching } from './api-firebase.js';
+
+    // Redirect if not logged in
+    const sessionUser = sessionStorage.getItem('rvc_user');
+    if (!sessionUser) {
       window.location.href = 'index.html';
+    }
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await logoutUser();
+      sessionStorage.removeItem("rvc_user");
+      window.location.href = "index.html";
     });
+
+    // Placeholder report buttons
+    document.getElementById("excelBtn").addEventListener("click", () => {
+      alert("Excel export coming soon");
+    });
+
+    document.getElementById("pdfBtn").addEventListener("click", () => {
+      alert("PDF export coming soon");
+    });
+
+    // Load Report Data (future chart logic)
+    async function loadReportData() {
+      try {
+        const evals = await listEvaluations();
+        const coaching = await listCoaching();
+
+        console.log("Evaluations:", evals);
+        console.log("Coaching Logs:", coaching);
+
+        // Later, we will use these for charts
+      } catch (err) {
+        console.error("REPORT LOAD ERROR:", err);
+      }
+    }
+
+    loadReportData();
   </script>
+
 </body>
 </html>
