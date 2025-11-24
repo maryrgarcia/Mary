@@ -1,15 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard — Royal Vending</title>
   <link rel="stylesheet" href="assets/css/style.css">
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-  <script src="api-firebase.js"></script>
 </head>
 <body>
+
   <header>
     <img src="assets/images/logo.png" alt="Royal Vending" class="logo">
     <nav>
@@ -24,12 +21,14 @@
 
   <main>
     <h1>Dashboard</h1>
+
     <div id="summaryCards">
       <div>Average Score: <span id="avgScore">0</span></div>
       <div>Total Coaching: <span id="totalCoaching">0</span></div>
       <div>Members Evaluated: <span id="membersEvaluated">0</span></div>
       <div>Top Skill: <span id="topSkill">-</span></div>
     </div>
+
     <div id="quickActions">
       <button onclick="window.location.href='evaluations.html'">+ New Evaluation</button>
       <button onclick="window.location.href='coaching.html'">+ Add Coaching Log</button>
@@ -37,24 +36,41 @@
     </div>
   </main>
 
-  <script>
-    async function loadDashboard() {
-      try {
-        const data = await adminListAll(); // reuse API helper
-        // For demo, just fill summary cards with dummy calculations
-        document.getElementById('avgScore').textContent = '85';
-        document.getElementById('totalCoaching').textContent = data.members.length;
-        document.getElementById('membersEvaluated').textContent = data.members.length;
-        document.getElementById('topSkill').textContent = 'Customer Service';
-      } catch(err) { console.error(err); }
+  <!-- MODULAR FIREBASE SCRIPT -->
+  <script type="module">
+    import { logoutUser, adminListAll } from './api-firebase.js';
+
+    // Redirect if not logged in
+    const sessionUser = sessionStorage.getItem('rvc_user');
+    if (!sessionUser) {
+      window.location.href = 'index.html';
     }
 
-    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
+    // Load Dashboard data
+    async function loadDashboard() {
+      try {
+        const data = await adminListAll();
+
+        // For now, these are demo placeholders
+        document.getElementById('avgScore').textContent = "85";
+        document.getElementById('totalCoaching').textContent = data.members.length;
+        document.getElementById('membersEvaluated').textContent = data.users.length;
+        document.getElementById('topSkill').textContent = "Customer Service";
+
+      } catch (err) {
+        console.error("Dashboard load error:", err);
+      }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
       await logoutUser();
+      sessionStorage.removeItem('rvc_user');
       window.location.href = 'index.html';
     });
 
     loadDashboard();
   </script>
+
 </body>
 </html>
