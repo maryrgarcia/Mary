@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="assets/css/style.css">
 
   <style>
-    /* Simple inline modal styling */
     .modal-bg {
       display: none;
       position: fixed;
@@ -18,8 +17,25 @@
     .modal {
       background: white;
       padding: 20px;
-      width: 400px;
+      width: 420px;
       border-radius: 8px;
+    }
+    .skill-row {
+      margin-bottom: 12px;
+    }
+    .skill-row label {
+      font-weight: bold;
+      display: block;
+    }
+    .skill-row input[type=radio] {
+      margin-right: 6px;
+      margin-left: 4px;
+    }
+    .notes {
+      width: 100%;
+      margin-top: 6px;
+      height: 45px;
+      display: none;
     }
   </style>
 </head>
@@ -43,50 +59,31 @@
 
   <!-- FILTER BAR -->
   <div class="filter-bar">
-    <select id="filterMember">
-      <option value="">Team Member</option>
-    </select>
-
-    <select id="filterMonth">
-      <option value="">Month</option>
-    </select>
-
-    <select id="filterEvaluator">
-      <option value="">Evaluator</option>
-    </select>
-
-    <select id="filterScore">
-      <option value="">Score Range</option>
-      <option value="90-100">90 - 100</option>
-      <option value="80-89">80 - 89</option>
-      <option value="70-79">70 - 79</option>
-      <option value="0-69">Below 70</option>
-    </select>
-
+    <select id="filterMember"><option value="">Team Member</option></select>
+    <select id="filterEvaluator"><option value="">Evaluator</option></select>
     <input type="text" id="filterSearch" placeholder="Search...">
     <button id="applyFilters">Search</button>
   </div>
 
   <button id="openEvalModal">+ Add New Evaluation</button>
 
-  <!-- EVALUATIONS TABLE -->
+  <!-- TABLE -->
   <table id="evalTable" border="1">
     <thead>
       <tr>
         <th>Team Member</th>
         <th>Evaluator</th>
         <th>Total Score</th>
-        <th>Key Strength</th>
-        <th>Area for Improvement</th>
+        <th>✔ Count</th>
+        <th>❌ Count</th>
         <th>View</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-
 </main>
 
-<!-- ADD EVALUATION MODAL -->
+<!-- EVALUATION MODAL -->
 <div class="modal-bg" id="evalModal">
   <div class="modal">
     <h3>New Evaluation</h3>
@@ -100,31 +97,57 @@
     <label>Evaluator</label>
     <select id="evEvaluator"></select>
 
-    <h4>Skill Scores (1–5)</h4>
+    <h4>Skill Check (✔️ Meets | ❌ Needs Improvement)</h4>
 
-    <label>Communication</label>
-    <input type="number" id="sc1" min="1" max="5">
+    <!-- SKILL SET -->
+    <div class="skill-row">
+      <label>Communication</label>
+      <label><input type="radio" name="comm" value="yes"> ✔️</label>
+      <label><input type="radio" name="comm" value="no"> ❌</label>
+      <textarea id="commNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Relationship Building</label>
-    <input type="number" id="sc2" min="1" max="5">
+    <div class="skill-row">
+      <label>Relationship Building</label>
+      <label><input type="radio" name="rel" value="yes"> ✔️</label>
+      <label><input type="radio" name="rel" value="no"> ❌</label>
+      <textarea id="relNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Problem-Solving</label>
-    <input type="number" id="sc3" min="1" max="5">
+    <div class="skill-row">
+      <label>Problem-Solving</label>
+      <label><input type="radio" name="prob" value="yes"> ✔️</label>
+      <label><input type="radio" name="prob" value="no"> ❌</label>
+      <textarea id="probNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Task Management</label>
-    <input type="number" id="sc4" min="1" max="5">
+    <div class="skill-row">
+      <label>Task Management</label>
+      <label><input type="radio" name="task" value="yes"> ✔️</label>
+      <label><input type="radio" name="task" value="no"> ❌</label>
+      <textarea id="taskNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Customer Service</label>
-    <input type="number" id="sc5" min="1" max="5">
+    <div class="skill-row">
+      <label>Customer Service</label>
+      <label><input type="radio" name="cust" value="yes"> ✔️</label>
+      <label><input type="radio" name="cust" value="no"> ❌</label>
+      <textarea id="custNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Analytical & Reporting Skills</label>
-    <input type="number" id="sc6" min="1" max="5">
+    <div class="skill-row">
+      <label>Analytical & Reporting Skills</label>
+      <label><input type="radio" name="ana" value="yes"> ✔️</label>
+      <label><input type="radio" name="ana" value="no"> ❌</label>
+      <textarea id="anaNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
-    <label>Accuracy & Attention to Detail</label>
-    <input type="number" id="sc7" min="1" max="5">
-
-    <label>Comments / Notes</label>
-    <textarea id="evNotes"></textarea>
+    <div class="skill-row">
+      <label>Accuracy & Attention to Detail</label>
+      <label><input type="radio" name="acc" value="yes"> ✔️</label>
+      <label><input type="radio" name="acc" value="no"> ❌</label>
+      <textarea id="accNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    </div>
 
     <label>Total Score</label>
     <input id="evTotal" readonly>
@@ -134,42 +157,35 @@
   </div>
 </div>
 
-<!-- FIREBASE MODULAR -->
+<!-- FIREBASE LOGIC -->
 <script type="module">
-  import {
-    listEvaluations,
-    addEvaluation,
-    adminListAll,
-    logoutUser
-  } from './api-firebase.js';
+  import { listEvaluations, addEvaluation, adminListAll, logoutUser } from './api-firebase.js';
 
-  const user = sessionStorage.getItem("rvc_user");
-  if (!user) window.location.href = "index.html";
+  // ========== SESSION PROTECT ==========
+  if (!sessionStorage.getItem("rvc_user")) window.location.href = "index.html";
 
-  // ============= LOGOUT =============
   document.getElementById("logoutBtn").addEventListener("click", async () => {
     await logoutUser();
     sessionStorage.removeItem("rvc_user");
     window.location.href = "index.html";
   });
 
-  // ============= LOAD FILTER OPTIONS =============
+  // ========== LOAD FILTER OPTIONS ==========
   async function loadFilters() {
     const data = await adminListAll();
 
-    const memberSel = document.getElementById("filterMember");
-    const evaluatorSel = document.getElementById("filterEvaluator");
-
-    data.users.forEach(u => {
-      evaluatorSel.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+    data.members.forEach(m => {
+      filterMember.innerHTML += `<option value="${m[0]}">${m[0]}</option>`;
+      evMember.innerHTML += `<option value="${m[0]}">${m[0]}</option>`;
     });
 
-    data.members.forEach(m => {
-      memberSel.innerHTML += `<option value="${m[0]}">${m[0]}</option>`;
+    data.users.forEach(u => {
+      filterEvaluator.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+      evEvaluator.innerHTML += `<option value="${u.name}">${u.name}</option>`;
     });
   }
 
-  // ============= LOAD TABLE =============
+  // ========== LOAD TABLE ==========
   async function loadEvaluations(filteredList = null) {
     const tbody = document.querySelector("#evalTable tbody");
     tbody.innerHTML = "";
@@ -177,101 +193,122 @@
     const list = filteredList || await listEvaluations();
 
     list.forEach(r => {
+      const skillValues = r.skills ? Object.values(r.skills) : [];
+      const checks = skillValues.filter(s => s.value === "✔️").length;
+      const xes = skillValues.filter(s => s.value === "❌").length;
+
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.member}</td>
         <td>${r.evaluator}</td>
         <td>${r.total}</td>
-        <td>${r.strength || "-"}</td>
-        <td>${r.improvement || "-"}</td>
-        <td><button onclick="alert('Detail page coming soon')">View</button></td>
+        <td>${checks}</td>
+        <td>${xes}</td>
+        <td><button onclick="alert('Details view coming soon')">View</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // ============= FILTER LOGIC =============
-  document.getElementById("applyFilters").addEventListener("click", async () => {
+  // ========== FILTER SEARCH ==========
+  applyFilters.addEventListener("click", async () => {
     const list = await listEvaluations();
-
-    const member = document.getElementById("filterMember").value;
-    const month = document.getElementById("filterMonth").value;
-    const evaluator = document.getElementById("filterEvaluator").value;
-    const score = document.getElementById("filterScore").value;
-    const search = document.getElementById("filterSearch").value.toLowerCase();
+    const member = filterMember.value;
+    const evaluator = filterEvaluator.value;
+    const search = filterSearch.value.toLowerCase();
 
     let filtered = list;
 
     if (member) filtered = filtered.filter(r => r.member === member);
     if (evaluator) filtered = filtered.filter(r => r.evaluator === evaluator);
-    if (search) filtered = filtered.filter(r =>
-      JSON.stringify(r).toLowerCase().includes(search)
-    );
+    if (search) filtered = filtered.filter(r => JSON.stringify(r).toLowerCase().includes(search));
 
     loadEvaluations(filtered);
   });
 
-  // ============= MODAL CONTROL =============
+  // ========== MODAL CONTROLS ==========
   const modal = document.getElementById("evalModal");
   document.getElementById("openEvalModal").onclick = () => modal.style.display = "flex";
   document.getElementById("closeEvalModal").onclick = () => modal.style.display = "none";
 
-  // ============= FILL MODAL SELECTS =============
-  async function fillModalSelects() {
-    const data = await adminListAll();
-    const evMember = document.getElementById("evMember");
-    const evEvaluator = document.getElementById("evEvaluator");
+  // ========== SKILL LOGIC ==========
+  const skillPairs = [
+    ["comm","commNotes"],
+    ["rel","relNotes"],
+    ["prob","probNotes"],
+    ["task","taskNotes"],
+    ["cust","custNotes"],
+    ["ana","anaNotes"],
+    ["acc","accNotes"]
+  ];
 
-    data.members.forEach(m => {
-      evMember.innerHTML += `<option value="${m[0]}">${m[0]}</option>`;
+  skillPairs.forEach(([name, notesId]) => {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+      radio.addEventListener("change", () => {
+        const notes = document.getElementById(notesId);
+        if (radio.value === "no") notes.style.display = "block";
+        else { notes.style.display = "none"; notes.value = ""; }
+        calculateFinalScore();
+      });
     });
-
-    data.users.forEach(u => {
-      evEvaluator.innerHTML += `<option value="${u.name}">${u.name}</option>`;
-    });
-  }
-
-  // ============= TOTAL SCORE AUTO-CALC =============
-  function calcTotal() {
-    const values = [
-      "sc1","sc2","sc3","sc4","sc5","sc6","sc7"
-    ].map(id => Number(document.getElementById(id).value || 0));
-
-    const total = values.reduce((a,b) => a + b, 0);
-    document.getElementById("evTotal").value = total;
-  }
-
-  ["sc1","sc2","sc3","sc4","sc5","sc6","sc7"].forEach(id => {
-    document.getElementById(id).addEventListener("input", calcTotal);
   });
 
-  // ============= SUBMIT EVALUATION =============
-  document.getElementById("submitEval").addEventListener("click", async () => {
+  function calculateFinalScore() {
+    let correct = 0;
+    skillPairs.forEach(([name]) => {
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      if (selected && selected.value === "yes") correct++;
+    });
+    const percent = (correct / 7) * 100;
+    evTotal.value = percent.toFixed(2) + "%";
+  }
+
+  // ========== SUBMIT EVALUATION ==========
+  submitEval.addEventListener("click", async () => {
+    const skillData = {};
+    let correct = 0;
+
+    skillPairs.forEach(([name, notesId]) => {
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      const notes = document.getElementById(notesId).value;
+
+      if (!selected) {
+        alert("Please select ✔️ or ❌ for all skills.");
+        throw "missing";
+      }
+      if (selected.value === "no" && !notes.trim()) {
+        alert("Please enter reason for all ❌ marks.");
+        throw "missing notes";
+      }
+
+      if (selected.value === "yes") correct++;
+
+      skillData[name] = {
+        value: selected.value === "yes" ? "✔️" : "❌",
+        notes: notes || ""
+      };
+    });
+
+    const percentage = (correct / 7) * 100;
+
     const payload = {
-      member: document.getElementById("evMember").value,
-      evaluator: document.getElementById("evEvaluator").value,
-      date: document.getElementById("evDate").value,
-      communication: Number(sc1.value),
-      relationship: Number(sc2.value),
-      problemSolving: Number(sc3.value),
-      taskManagement: Number(sc4.value),
-      customerService: Number(sc5.value),
-      analytical: Number(sc6.value),
-      accuracy: Number(sc7.value),
-      notes: document.getElementById("evNotes").value,
-      total: Number(document.getElementById("evTotal").value),
-      strength: "N/A",
-      improvement: "N/A"
+      member: evMember.value,
+      evaluator: evEvaluator.value,
+      date: evDate.value,
+      total: percentage.toFixed(2) + "%",
+      skills: skillData,
+      createdAt: new Date()
     };
 
     await addEvaluation(payload);
+
+    alert("Evaluation saved!");
     modal.style.display = "none";
-    await loadEvaluations();
+    loadEvaluations();
   });
 
   // INIT
   loadFilters();
-  fillModalSelects();
   loadEvaluations();
 
 </script>
