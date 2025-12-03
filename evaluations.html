@@ -1,52 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Evaluations — Royal Vending</title>
   <link rel="stylesheet" href="assets/css/style.css">
 
   <style>
-    .modal-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal {
-      background: white;
-      padding: 20px;
-      width: 450px;
-      border-radius: 8px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .skill-row {
-      margin-bottom: 12px;
-    }
-    .skill-row label {
-      font-weight: bold;
-      display: block;
-    }
-    .skill-row input[type=radio] {
-      margin-right: 6px;
-      margin-left: 4px;
-    }
-    .notes {
-      width: 100%;
-      margin-top: 6px;
-      height: 45px;
-      display: none;
-    }
+    /* Modal + minor UI */
+    .modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; z-index:1000; }
+    .modal { background:#fff; padding:18px; border-radius:8px; width:640px; max-height:88vh; overflow:auto; }
+    .small-input { width:200px; }
+    .filter-bar { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+    .skill-row { margin-bottom:10px; }
+    .notes { width:100%; min-height:40px; display:none; margin-top:6px; }
+    .table-actions button { margin-right:6px; }
+    .flex-row { display:flex; gap:8px; align-items:center; }
+    .save-skill-row { display:flex; gap:6px; margin-top:6px; }
   </style>
 </head>
-
 <body>
 
 <header>
-  <img src="assets/images/logo.png" class="logo">
+  <img src="assets/images/logo.png" class="logo" alt="Royal Vending">
   <nav>
     <a href="dashboard.html">Dashboard</a>
     <a href="evaluations.html" class="active">Evaluations</a>
@@ -63,260 +38,717 @@
   <!-- FILTER BAR -->
   <div class="filter-bar">
     <select id="filterMember"><option value="">Team Member</option></select>
+    <select id="filterDept">
+      <option value="">Department</option>
+      <option value="Account Manager">Account Manager</option>
+      <option value="Technical Support">Technical Support</option>
+      <option value="Transport">Transport</option>
+      <option value="Inventory">Inventory</option>
+    </select>
+    <select id="filterMonth"><option value="">Month</option></select>
     <select id="filterEvaluator"><option value="">Evaluator</option></select>
-    <input type="text" id="filterSearch" placeholder="Search...">
+    <select id="filterScore">
+      <option value="">Score Range</option>
+      <option value="90-100">90 - 100</option>
+      <option value="80-89">80 - 89</option>
+      <option value="70-79">70 - 79</option>
+      <option value="0-69">Below 70</option>
+    </select>
+
+    <input id="filterSearch" placeholder="Search..." />
     <button id="applyFilters">Search</button>
+
+    <div style="margin-left:auto">
+      <button id="openEvalModal">+ Add New Evaluation</button>
+    </div>
   </div>
 
-  <button id="openEvalModal">+ Add New Evaluation</button>
-
   <!-- TABLE -->
-  <table id="evalTable" border="1">
+  <table id="evalTable" border="1" style="width:100%; border-collapse:collapse;">
     <thead>
       <tr>
         <th>Team Member</th>
+        <th>Dept</th>
         <th>Evaluator</th>
+        <th>Date</th>
         <th>% Score</th>
         <th>✔</th>
         <th>❌</th>
-        <th>View</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 </main>
 
-<!-- EVALUATION MODAL -->
+<!-- ADD / CREATE EVALUATION MODAL -->
 <div class="modal-bg" id="evalModal">
-  <div class="modal">
-    <h3>New Evaluation</h3>
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3>Add New Evaluation</h3>
 
-    <label>Date of Evaluation</label>
-    <input type="date" id="evDate">
-
-    <label>Team Member</label>
-    <select id="evMember"></select>
-
-    <label>Evaluator</label>
-    <select id="evEvaluator"></select>
-
-    <label>Call ID / Email Link</label>
-    <input type="text" id="evCallId" placeholder="Paste call ID or email link">
-
-    <label>Summary</label>
-    <textarea id="evSummary" placeholder="Brief summary"></textarea>
-
-    <h4>Skill Check (✔️ Meets | ❌ Needs Improvement)</h4>
-
-    <div class="skill-row">
-      <label>Communication</label>
-      <label><input type="radio" name="comm" value="yes"> ✔️</label>
-      <label><input type="radio" name="comm" value="no"> ❌</label>
-      <textarea id="commNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div class="flex-row">
+      <label>Date:</label>
+      <input type="date" id="evDate" />
+      <label style="margin-left:12px">Department:</label>
+      <select id="evDept">
+        <option value="Account Manager">Account Manager</option>
+        <option value="Technical Support">Technical Support</option>
+        <option value="Transport">Transport</option>
+        <option value="Inventory">Inventory</option>
+      </select>
     </div>
 
-    <div class="skill-row">
-      <label>Relationship Building</label>
-      <label><input type="radio" name="rel" value="yes"> ✔️</label>
-      <label><input type="radio" name="rel" value="no"> ❌</label>
-      <textarea id="relNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div style="margin-top:8px;">
+      <label>Team Member</label>
+      <select id="evMember" class="small-input"></select>
+
+      <label style="margin-left:12px">Evaluator</label>
+      <select id="evEvaluator" class="small-input"></select>
     </div>
 
-    <div class="skill-row">
-      <label>Problem-Solving</label>
-      <label><input type="radio" name="prob" value="yes"> ✔️</label>
-      <label><input type="radio" name="prob" value="no"> ❌</label>
-      <textarea id="probNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div style="margin-top:8px;">
+      <label>Call ID / Email Link</label>
+      <input type="text" id="evCallId" placeholder="Call ID or URL" style="width:60%;" />
     </div>
 
-    <div class="skill-row">
-      <label>Task Management</label>
-      <label><input type="radio" name="task" value="yes"> ✔️</label>
-      <label><input type="radio" name="task" value="no"> ❌</label>
-      <textarea id="taskNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div style="margin-top:8px;">
+      <label>Summary</label>
+      <textarea id="evSummary" placeholder="Short summary"></textarea>
     </div>
 
-    <div class="skill-row">
-      <label>Customer Service</label>
-      <label><input type="radio" name="cust" value="yes"> ✔️</label>
-      <label><input type="radio" name="cust" value="no"> ❌</label>
-      <textarea id="custNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <hr/>
+
+    <!-- Department skills area: dynamic -->
+    <div style="display:flex; gap:12px; align-items:center;">
+      <h4 style="margin:0">Skills</h4>
+      <button id="editSkillsBtn" title="Add or Save skills for this department" style="margin-left:8px;">Manage Skills</button>
     </div>
 
-    <div class="skill-row">
-      <label>Analytical & Reporting Skills</label>
-      <label><input type="radio" name="ana" value="yes"> ✔️</label>
-      <label><input type="radio" name="ana" value="no"> ❌</label>
-      <textarea id="anaNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div id="skillsContainer" style="margin-top:8px;"></div>
+
+    <!-- Manage skills area (hidden by default) -->
+    <div id="manageSkills" style="display:none; margin-top:8px; border:1px solid #eee; padding:8px;">
+      <label>Existing skills for department:</label>
+      <ul id="existingSkills"></ul>
+
+      <div class="save-skill-row">
+        <input id="newSkillInput" placeholder="New skill name" />
+        <button id="addSkillBtn">Add</button>
+        <button id="saveSkillsBtn">Save to Department</button>
+      </div>
+      <p style="font-size:12px; color:#666; margin-top:6px;">
+        Saving will store the skill-set under the department so next time it's preloaded.
+      </p>
     </div>
 
-    <div class="skill-row">
-      <label>Accuracy & Attention to Detail</label>
-      <label><input type="radio" name="acc" value="yes"> ✔️</label>
-      <label><input type="radio" name="acc" value="no"> ❌</label>
-      <textarea id="accNotes" class="notes" placeholder="Reason for ❌"></textarea>
+    <div style="margin-top:8px;">
+      <label>Total Score</label>
+      <input id="evTotal" readonly />
     </div>
 
-    <label>Total Score</label>
-    <input id="evTotal" readonly>
+    <div style="margin-top:8px;">
+      <label>Comments / Notes</label>
+      <textarea id="evNotes" placeholder="Additional notes"></textarea>
+    </div>
 
-    <label>Feedback</label>
-    <textarea id="evFeedback" placeholder="Overall feedback"></textarea>
-
-    <button id="submitEval">Submit Evaluation</button>
-    <button id="closeEvalModal">Cancel</button>
+    <div style="margin-top:12px;">
+      <button id="submitEval">Submit</button>
+      <button id="closeEvalModal">Cancel</button>
+    </div>
   </div>
 </div>
 
-<!-- FIREBASE SCRIPT -->
+<!-- VIEW / EDIT / DELETE MODALS -->
+<div class="modal-bg" id="viewModal">
+  <div class="modal">
+    <h3>Evaluation Details</h3>
+    <div id="viewContent"></div>
+    <div style="margin-top:10px;">
+      <button id="closeView">Close</button>
+      <button id="openEditFromView">Edit</button>
+      <button id="deleteFromView" style="color: #900;">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h3>Edit Evaluation</h3>
+    <input type="hidden" id="editId" />
+    <label>Date</label>
+    <input type="date" id="editDate" />
+    <label>Department</label>
+    <select id="editDept">
+      <option>Account Manager</option>
+      <option>Technical Support</option>
+      <option>Transport</option>
+      <option>Inventory</option>
+    </select>
+
+    <label>Team Member</label>
+    <select id="editMember"></select>
+
+    <label>Evaluator</label>
+    <select id="editEvaluator"></select>
+
+    <label>Call ID</label>
+    <input id="editCallId" />
+
+    <label>Summary</label>
+    <textarea id="editSummary"></textarea>
+
+    <div id="editSkillsContainer"></div>
+
+    <label>Total</label>
+    <input id="editTotal" readonly />
+
+    <label>Feedback</label>
+    <textarea id="editFeedback"></textarea>
+
+    <div style="margin-top:10px;">
+      <button id="saveEditBtn">Save</button>
+      <button id="cancelEditBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIREBASE + PAGE LOGIC (module) -->
 <script type="module">
-  import { listEvaluations, addEvaluation, adminListAll, logoutUser } from './api-firebase.js';
+  // Import app helpers & db exported from your api-firebase.js
+  import {
+    listEvaluations,
+    addEvaluation,
+    adminListAll,
+    logoutUser,
+    // api-firebase.js should export `db` so we can read/write departmentSkills directly
+    db
+  } from './api-firebase.js';
 
-  if (!sessionStorage.getItem("rvc_user")) window.location.href = "index.html";
+  // Additional firestore helpers we need directly in this page
+  import { doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
+  // session guard
+  if (!sessionStorage.getItem('rvc_user')) window.location.href = 'index.html';
+
+  // DOM refs
+  const filterMember = document.getElementById('filterMember');
+  const filterDept = document.getElementById('filterDept');
+  const filterMonth = document.getElementById('filterMonth');
+  const filterEvaluator = document.getElementById('filterEvaluator');
+  const filterScore = document.getElementById('filterScore');
+  const filterSearch = document.getElementById('filterSearch');
+  const applyFilters = document.getElementById('applyFilters');
+
+  const openEvalModal = document.getElementById('openEvalModal');
+  const evalModal = document.getElementById('evalModal');
+  const closeEvalModal = document.getElementById('closeEvalModal');
+
+  const evDate = document.getElementById('evDate');
+  const evDept = document.getElementById('evDept');
+  const evMember = document.getElementById('evMember');
+  const evEvaluator = document.getElementById('evEvaluator');
+  const evCallId = document.getElementById('evCallId');
+  const evSummary = document.getElementById('evSummary');
+  const skillsContainer = document.getElementById('skillsContainer');
+  const evTotal = document.getElementById('evTotal');
+  const evNotes = document.getElementById('evNotes');
+  const submitEval = document.getElementById('submitEval');
+
+  const manageSkills = document.getElementById('manageSkills');
+  const editSkillsBtn = document.getElementById('editSkillsBtn');
+  const existingSkills = document.getElementById('existingSkills');
+  const newSkillInput = document.getElementById('newSkillInput');
+  const addSkillBtn = document.getElementById('addSkillBtn');
+  const saveSkillsBtn = document.getElementById('saveSkillsBtn');
+
+  // View / edit / delete refs
+  const viewModal = document.getElementById('viewModal');
+  const viewContent = document.getElementById('viewContent');
+  const closeView = document.getElementById('closeView');
+  const openEditFromView = document.getElementById('openEditFromView');
+  const deleteFromView = document.getElementById('deleteFromView');
+
+  const editModal = document.getElementById('editModal');
+  const editId = document.getElementById('editId');
+  const editDate = document.getElementById('editDate');
+  const editDept = document.getElementById('editDept');
+  const editMember = document.getElementById('editMember');
+  const editEvaluator = document.getElementById('editEvaluator');
+  const editCallId = document.getElementById('editCallId');
+  const editSummary = document.getElementById('editSummary');
+  const editSkillsContainer = document.getElementById('editSkillsContainer');
+  const editTotal = document.getElementById('editTotal');
+  const editFeedback = document.getElementById('editFeedback');
+  const saveEditBtn = document.getElementById('saveEditBtn');
+  const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
     await logoutUser();
-    sessionStorage.removeItem("rvc_user");
-    window.location.href = "index.html";
+    sessionStorage.removeItem('rvc_user');
+    window.location.href = 'index.html';
   });
 
-  // Load members/users into dropdowns
-  async function loadFilters() {
-    const data = await adminListAll();
+  // Keep all evaluations in memory so view/edit can access them quickly
+  window._allEvaluations = [];
 
-    data.members.forEach(m => {
-      filterMember.innerHTML += `<option value="${m.name || m[0]}">${m.name || m[0]}</option>`;
-      evMember.innerHTML += `<option value="${m.name || m[0]}">${m.name || m[0]}</option>`;
-    });
+  // ---------------------------
+  // Helpers: Department skills
+  // ---------------------------
+  async function loadDepartmentSkills(dept) {
+    if (!dept) return [];
+    try {
+      const docRef = doc(db, 'departmentSkills', dept);
+      const snap = await getDoc(docRef);
+      if (!snap.exists()) {
+        // fallback defaults per department
+        const defaults = {
+          "Account Manager": ["Communication","Relationship Building","Task Management","Customer Service","Accuracy & Attention to Detail","Analytical & Reporting Skills","Problem-Solving"],
+          "Technical Support": ["Communication","Problem-Solving","Task Management","Accuracy & Attention to Detail","Analytical & Reporting Skills","Customer Service","Relationship Building"],
+          "Transport": ["Accuracy & Attention to Detail","Task Management","Communication","Customer Service","Relationship Building","Problem-Solving","Analytical & Reporting Skills"],
+          "Inventory": ["Accuracy & Attention to Detail","Task Management","Analytical & Reporting Skills","Communication","Problem-Solving","Relationship Building","Customer Service"]
+        };
+        return defaults[dept] || [];
+      } else {
+        const data = snap.data();
+        return Array.isArray(data.skills) ? data.skills : [];
+      }
+    } catch (err) {
+      console.error("loadDepartmentSkills:", err);
+      return [];
+    }
+  }
 
-    data.users.forEach(u => {
-      filterEvaluator.innerHTML += `<option value="${u.name}">${u.name}</option>`;
-      evEvaluator.innerHTML += `<option value="${u.name}">${u.name}</option>`;
+  async function saveDepartmentSkills(dept, skills) {
+    if (!dept) throw new Error("No department");
+    const docRef = doc(db, 'departmentSkills', dept);
+    await setDoc(docRef, { skills }, { merge: true });
+  }
+
+  // ---------------------------
+  // Render skills UI for modal (Add) and for Edit
+  // ---------------------------
+  function renderSkillsForContainer(skills, container, prefix = '') {
+    container.innerHTML = '';
+    skills.forEach((s, i) => {
+      const id = `${prefix}skill_${i}`;
+      const yesName = `${prefix}skill_yes_${i}`;
+      const noName = `${prefix}skill_no_${i}`;
+      const notesId = `${prefix}skill_notes_${i}`;
+
+      const div = document.createElement('div');
+      div.className = 'skill-row';
+      div.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>${s}</strong>
+          <div>
+            <label><input type="radio" name="${yesName}" value="yes"> ✔️</label>
+            <label><input type="radio" name="${yesName}" value="no"> ❌</label>
+          </div>
+        </div>
+        <textarea id="${notesId}" class="notes" placeholder="Reason for ❌"></textarea>
+      `;
+      container.appendChild(div);
+
+      // attach change listeners to show notes when ❌
+      const radios = div.querySelectorAll(`input[type="radio"]`);
+      radios.forEach(r => {
+        r.addEventListener('change', () => {
+          const notesEl = document.getElementById(notesId);
+          if (r.value === 'no') notesEl.style.display = 'block';
+          else notesEl.style.display = 'none';
+          calculateTotalFromContainer(container, prefix);
+        });
+      });
     });
   }
 
-  // Load table data
+  function calculateTotalFromContainer(container, prefix = '') {
+    const rows = Array.from(container.querySelectorAll('.skill-row'));
+    let totalYes = 0;
+    rows.forEach((row, i) => {
+      const yesName = `${prefix}skill_yes_${i}`;
+      const selected = row.querySelector(`input[name="${yesName}"]:checked`);
+      if (selected && selected.value === 'yes') totalYes++;
+    });
+    const percent = rows.length ? (totalYes / rows.length) * 100 : 0;
+    if (prefix === 'edit_') {
+      editTotal.value = percent.toFixed(2) + '%';
+    } else {
+      evTotal.value = percent.toFixed(2) + '%';
+    }
+    return { percent, yesCount: totalYes, totalItems: rows.length };
+  }
+
+  // ---------------------------
+  // Load filters and dropdowns
+  // ---------------------------
+  async function loadFiltersAndDropdowns() {
+    const data = await adminListAll();
+
+    // members - adminListAll may return array-of-arrays or objects (we handle both)
+    const members = data.members || [];
+    filterMember.innerHTML = '<option value="">Team Member</option>';
+    evMember.innerHTML = '<option value="">Select</option>';
+    editMember.innerHTML = '<option value="">Select</option>';
+
+    members.forEach(m => {
+      const name = (m && (m.name || m[0])) || String(m);
+      filterMember.innerHTML += `<option value="${name}">${name}</option>`;
+      evMember.innerHTML += `<option value="${name}">${name}</option>`;
+      editMember.innerHTML += `<option value="${name}">${name}</option>`;
+    });
+
+    filterEvaluator.innerHTML = '<option value="">Evaluator</option>';
+    evEvaluator.innerHTML = '<option value="">Select</option>';
+    editEvaluator.innerHTML = '<option value="">Select</option>';
+
+    (data.users || []).forEach(u => {
+      const nm = u.name || u.email || u[0] || '';
+      filterEvaluator.innerHTML += `<option value="${nm}">${nm}</option>`;
+      evEvaluator.innerHTML += `<option value="${nm}">${nm}</option>`;
+      editEvaluator.innerHTML += `<option value="${nm}">${nm}</option>`;
+    });
+  }
+
+  // ---------------------------
+  // Load evaluations into table
+  // ---------------------------
   async function loadEvaluations(listOverride = null) {
+    const tbody = document.querySelector('#evalTable tbody');
+    tbody.innerHTML = '';
+
     const list = listOverride || await listEvaluations();
-    const tbody = document.querySelector("#evalTable tbody");
-    tbody.innerHTML = "";
+    // keep globally
+    window._allEvaluations = list.map((d) => ({ id: d.id || d._id || d.docId || d._docId || null, ...d }));
 
-    list.forEach(r => {
+    list.forEach((r) => {
       const skills = r.skills ? Object.values(r.skills) : [];
-      const checks = skills.filter(s => s.value === "✔️").length;
-      const xes = skills.filter(s => s.value === "❌").length;
-
-      const tr = document.createElement("tr");
+      const checks = skills.filter(s => s.value === '✔️').length;
+      const xes = skills.filter(s => s.value === '❌').length;
+      const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.member}</td>
-        <td>${r.evaluator}</td>
-        <td>${r.total}</td>
+        <td>${r.member || ''}</td>
+        <td>${r.department || r.dept || ''}</td>
+        <td>${r.evaluator || ''}</td>
+        <td>${r.date || ''}</td>
+        <td>${r.total || ''}</td>
         <td>${checks}</td>
         <td>${xes}</td>
-        <td><button onclick="alert('View feature coming soon')">View</button></td>
+        <td class="table-actions">
+          <button onclick="viewEval('${r.id || r._id || r._docId || r.docId || ''}')">View</button>
+          <button onclick="editEval('${r.id || r._id || r._docId || r.docId || ''}')">Edit</button>
+          <button onclick="deleteEval('${r.id || r._id || r._docId || r.docId || ''}')">Delete</button>
+        </td>
       `;
       tbody.appendChild(tr);
     });
+
+    // populate months filter from data
+    const months = Array.from(new Set(list.map(x => (x.date || '').slice(0,7)).filter(Boolean))).sort().reverse();
+    filterMonth.innerHTML = '<option value="">Month</option>';
+    months.forEach(m => filterMonth.innerHTML += `<option value="${m}">${m}</option>`);
   }
 
-  // Apply filters
-  applyFilters.addEventListener("click", async () => {
+  // ---------------------------
+  // Filter handler
+  // ---------------------------
+  applyFilters.addEventListener('click', async () => {
     let list = await listEvaluations();
-
-    if (filterMember.value)
-      list = list.filter(e => e.member === filterMember.value);
-
-    if (filterEvaluator.value)
-      list = list.filter(e => e.evaluator === filterEvaluator.value);
-
-    if (filterSearch.value)
-      list = list.filter(e =>
-        JSON.stringify(e).toLowerCase().includes(filterSearch.value.toLowerCase())
-      );
-
+    if (filterMember.value) list = list.filter(e => e.member === filterMember.value);
+    if (filterDept.value) list = list.filter(e => (e.department || e.dept) === filterDept.value);
+    if (filterMonth.value) list = list.filter(e => (e.date || '').startsWith(filterMonth.value));
+    if (filterEvaluator.value) list = list.filter(e => e.evaluator === filterEvaluator.value);
+    if (filterScore.value) {
+      const [min, max] = filterScore.value.split('-').map(Number);
+      list = list.filter(e => {
+        const v = parseFloat((e.total || '0').replace('%','')) || 0;
+        return v >= min && v <= (max || 100);
+      });
+    }
+    if (filterSearch.value) {
+      const q = filterSearch.value.toLowerCase();
+      list = list.filter(e => JSON.stringify(e).toLowerCase().includes(q));
+    }
     loadEvaluations(list);
   });
 
-  // Modal controls
-  const modal = document.getElementById("evalModal");
-  openEvalModal.onclick = () => modal.style.display = "flex";
-  closeEvalModal.onclick = () => modal.style.display = "none";
-
-  const skillPairs = [
-    ["comm","commNotes"],
-    ["rel","relNotes"],
-    ["prob","probNotes"],
-    ["task","taskNotes"],
-    ["cust","custNotes"],
-    ["ana","anaNotes"],
-    ["acc","accNotes"]
-  ];
-
-  skillPairs.forEach(([name, notesId]) => {
-    document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
-      radio.addEventListener("change", () => {
-        const notes = document.getElementById(notesId);
-        if (radio.value === "no") notes.style.display = "block";
-        else { notes.style.display = "none"; notes.value = ""; }
-        calculateFinalScore();
-      });
-    });
+  // ---------------------------
+  // Skills management UI
+  // ---------------------------
+  editSkillsBtn.addEventListener('click', async () => {
+    if (manageSkills.style.display === 'none' || manageSkills.style.display === '') {
+      manageSkills.style.display = 'block';
+      await refreshExistingSkills();
+    } else {
+      manageSkills.style.display = 'none';
+    }
   });
 
-  function calculateFinalScore() {
-    let correct = 0;
-    skillPairs.forEach(([name]) => {
-      const selected = document.querySelector(`input[name="${name}"]:checked`);
-      if (selected && selected.value === "yes") correct++;
+  addSkillBtn.addEventListener('click', () => {
+    const val = newSkillInput.value.trim();
+    if (!val) return;
+    const li = document.createElement('li');
+    li.textContent = val;
+    existingSkills.appendChild(li);
+    newSkillInput.value = '';
+  });
+
+  saveSkillsBtn.addEventListener('click', async () => {
+    const dept = evDept.value;
+    if (!dept) return alert('Choose department');
+    const arr = Array.from(existingSkills.querySelectorAll('li')).map(li => li.textContent.trim()).filter(Boolean);
+    await saveDepartmentSkills(dept, arr);
+    alert('Skills saved for ' + dept);
+    manageSkills.style.display = 'none';
+  });
+
+  async function refreshExistingSkills() {
+    existingSkills.innerHTML = '';
+    const skills = await loadDepartmentSkills(evDept.value);
+    skills.forEach(s => {
+      const li = document.createElement('li'); li.textContent = s; existingSkills.appendChild(li);
     });
-    evTotal.value = ((correct / 7) * 100).toFixed(2) + "%";
   }
 
-  // Submit evaluation
-  submitEval.addEventListener("click", async () => {
-    const skillData = {};
-    let correct = 0;
+  // when department changes, render its skills
+  evDept.addEventListener('change', async () => {
+    const sk = await loadDepartmentSkills(evDept.value);
+    renderSkillsForContainer(sk, skillsContainer);
+  });
 
-    for (const [name, notesId] of skillPairs) {
-      const selected = document.querySelector(`input[name="${name}"]:checked`);
-      const notes = document.getElementById(notesId).value;
+  // ---------------------------
+  // Submit new evaluation
+  // ---------------------------
+  submitEval.addEventListener('click', async () => {
+    // collect skills from skillsContainer
+    const rows = Array.from(skillsContainer.querySelectorAll('.skill-row'));
+    if (rows.length === 0) return alert('No skills to evaluate (select a department or add skills).');
 
-      if (!selected) return alert("Please answer all skills ✔️ / ❌");
-      if (selected.value === "no" && !notes.trim()) return alert("Provide notes for ❌");
-
-      if (selected.value === "yes") correct++;
-
-      skillData[name] = {
-        value: selected.value === "yes" ? "✔️" : "❌",
-        notes
-      };
+    const skillObj = {};
+    let yesCount = 0;
+    for (let i=0;i<rows.length;i++){
+      const row = rows[i];
+      const skillName = row.querySelector('strong').textContent;
+      const selected = row.querySelector('input[type="radio"]:checked');
+      const notesEl = row.querySelector('textarea');
+      if (!selected) return alert('Please rate all skills');
+      if (selected.value === 'no' && (!notesEl.value.trim())) return alert('Please enter notes for ❌ items');
+      const val = selected.value === 'yes' ? '✔️' : '❌';
+      if (val === '✔️') yesCount++;
+      skillObj['s' + i] = { name: skillName, value: val, notes: notesEl.value || '' };
     }
 
-    const total = ((correct / 7) * 100).toFixed(2) + "%";
+    const total = ((yesCount / rows.length) * 100).toFixed(2) + '%';
 
     const payload = {
       member: evMember.value,
-      evaluator: evEvaluator.value,
+      department: evDept.value,
       date: evDate.value,
+      evaluator: evEvaluator.value,
       callId: evCallId.value,
       summary: evSummary.value,
-      feedback: evFeedback.value,
+      skills: skillObj,
       total,
-      skills: skillData,
+      feedback: evNotes.value,
       createdAt: new Date()
     };
 
     await addEvaluation(payload);
-    alert("Evaluation saved!");
-    modal.style.display = "none";
-    loadEvaluations();
+    alert('Saved');
+    evalModal.style.display = 'none';
+    // refresh
+    await loadEvaluations();
   });
 
+  // ---------------------------
+  // View / Edit / Delete functions
+  // ---------------------------
+  window.viewEval = function(id) {
+    const list = window._allEvaluations || [];
+    const doc = list.find(x => x.id === id);
+    if (!doc) return alert('Not found');
+    // build HTML
+    let html = `<p><strong>Date:</strong> ${doc.date || ''}</p>
+                <p><strong>Member:</strong> ${doc.member || ''}</p>
+                <p><strong>Dept:</strong> ${doc.department || doc.dept || ''}</p>
+                <p><strong>Evaluator:</strong> ${doc.evaluator || ''}</p>
+                <p><strong>Call ID:</strong> ${doc.callId || ''}</p>
+                <p><strong>Summary:</strong> ${doc.summary || ''}</p>
+                <p><strong>Feedback:</strong> ${doc.feedback || ''}</p>
+                <p><strong>Total:</strong> ${doc.total || ''}</p>
+                <hr/><h4>Skills</h4>`;
+    const skills = doc.skills || {};
+    Object.keys(skills).forEach(k => {
+      const s = skills[k];
+      html += `<p><strong>${s.name || k}</strong>: ${s.value} ${s.value==='❌' && s.notes?`<br/><em>Note: ${s.notes}</em>`:''}</p>`;
+    });
+
+    viewContent.innerHTML = html;
+    viewModal.style.display = 'flex';
+
+    // open edit or delete from view
+    openEditFromView.onclick = () => { viewModal.style.display='none'; editEval(doc.id); };
+    deleteFromView.onclick = async () => { viewModal.style.display='none'; deleteEval(doc.id); };
+  };
+
+  window.editEval = async function(id) {
+    const list = window._allEvaluations || [];
+    const docData = list.find(x => x.id === id);
+    if (!docData) return alert('Not found');
+
+    editId.value = id;
+    editDate.value = docData.date || '';
+    editDept.value = docData.department || docData.dept || evDept.value || '';
+    editMember.value = docData.member || '';
+    editEvaluator.value = docData.evaluator || '';
+    editCallId.value = docData.callId || '';
+    editSummary.value = docData.summary || '';
+    editFeedback.value = docData.feedback || '';
+    editTotal.value = docData.total || '';
+
+    // build edit skills UI
+    const skillsArr = Object.values(docData.skills || {});
+    editSkillsContainer.innerHTML = '';
+    skillsArr.forEach((s, i) => {
+      const idBase = `edit_skill_${i}`;
+      const div = document.createElement('div');
+      div.className = 'skill-row';
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong>${s.name || 'Skill ' + (i+1)}</strong>
+          <div>
+            <label><input type="radio" name="edit_${i}" value="yes" ${s.value==='✔️'?'checked':''}> ✔️</label>
+            <label><input type="radio" name="edit_${i}" value="no" ${s.value==='❌'?'checked':''}> ❌</label>
+          </div>
+        </div>
+        <textarea id="${idBase}_notes" class="notes" style="${s.value==='❌'?'display:block':''}">${s.notes||''}</textarea>
+      `;
+      editSkillsContainer.appendChild(div);
+
+      // attach change listeners
+      div.querySelectorAll('input[type="radio"]').forEach(r => {
+        r.addEventListener('change', () => {
+          const notesEl = div.querySelector('textarea');
+          if (r.value === 'no') notesEl.style.display = 'block'; else { notesEl.style.display='none'; }
+          calculateEditTotal();
+        });
+      });
+    });
+
+    calculateEditTotal();
+    editModal.style.display = 'flex';
+  };
+
+  async function calculateEditTotal() {
+    const rows = Array.from(editSkillsContainer.querySelectorAll('.skill-row'));
+    let yes = 0;
+    rows.forEach((row, i) => {
+      const selected = row.querySelector(`input[name="edit_${i}"]:checked`);
+      if (selected && selected.value === 'yes') yes++;
+    });
+    editTotal.value = rows.length ? ((yes / rows.length) * 100).toFixed(2) + '%' : '0%';
+  }
+
+  saveEditBtn.addEventListener('click', async () => {
+    const id = editId.value;
+    if (!id) return alert('Missing id');
+    const rows = Array.from(editSkillsContainer.querySelectorAll('.skill-row'));
+    const skillObj = {};
+    let yes = 0;
+    rows.forEach((row, i) => {
+      const name = row.querySelector('strong').textContent;
+      const selected = row.querySelector(`input[name="edit_${i}"]:checked`);
+      const notes = row.querySelector('textarea').value || '';
+      if (!selected) throw alert('Please rate all skills');
+      const val = selected.value === 'yes' ? '✔️' : '❌';
+      if (val === '✔️') yes++;
+      skillObj['s'+i] = { name, value: val, notes };
+    });
+
+    const updated = {
+      date: editDate.value,
+      department: editDept.value,
+      member: editMember.value,
+      evaluator: editEvaluator.value,
+      callId: editCallId.value,
+      summary: editSummary.value,
+      feedback: editFeedback.value,
+      skills: skillObj,
+      total: ((yes / rows.length) * 100).toFixed(2) + '%'
+    };
+
+    // update Firestore directly
+    await updateDoc(doc(db, 'evaluations', id), updated);
+    alert('Saved');
+    editModal.style.display = 'none';
+    await loadEvaluations();
+  });
+
+  cancelEditBtn.addEventListener('click', () => editModal.style.display = 'none');
+
+  window.deleteEval = async function(id) {
+    if (!confirm('Delete this evaluation?')) return;
+    await deleteDoc(doc(db, 'evaluations', id));
+    alert('Deleted');
+    loadEvaluations();
+  };
+
+  // ---------------------------
   // Initialize page
-  loadFilters();
-  loadEvaluations();
+  // ---------------------------
+  (async function init() {
+    await loadFiltersAndDropdowns();
+
+    // pre-load skills for default department
+    const initialSkills = await loadDepartmentSkills(evDept.value || 'Account Manager');
+    renderSkillsForContainer(initialSkills, skillsContainer);
+
+    // wire department change for edit modal also
+    editDept.addEventListener('change', async () => {
+      // when edit dept changes, replace editSkillsContainer with default skills
+      const sk = await loadDepartmentSkills(editDept.value);
+      // clear and build a simple skills UI so admin can edit them through edit modal if desired
+      editSkillsContainer.innerHTML = '';
+      sk.forEach((s, i) => {
+        const div = document.createElement('div'); div.className='skill-row';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${s}</strong>
+            <div>
+              <label><input type="radio" name="edit_new_${i}" value="yes"> ✔️</label>
+              <label><input type="radio" name="edit_new_${i}" value="no"> ❌</label>
+            </div>
+          </div>
+          <textarea id="edit_new_${i}_notes" class="notes" placeholder="Reason for ❌"></textarea>
+        `;
+        editSkillsContainer.appendChild(div);
+        div.querySelectorAll('input[type="radio"]').forEach(r => {
+          r.addEventListener('change', () => {
+            const notes = div.querySelector('textarea');
+            if (r.value === 'no') notes.style.display='block'; else { notes.style.display='none'; notes.value=''; }
+            calculateEditTotal();
+          });
+        });
+      });
+      calculateEditTotal();
+    });
+
+    // close modal listeners
+    closeEvalModal.addEventListener('click', () => evalModal.style.display = 'none');
+    closeView.addEventListener('click', () => viewModal.style.display = 'none');
+
+    // close modals when clicking outside modal content
+    document.querySelectorAll('.modal-bg').forEach(bg => {
+      bg.addEventListener('click', (e) => {
+        if (e.target === bg) bg.style.display = 'none';
+      });
+    });
+
+    // load table
+    await loadEvaluations();
+  })();
 
 </script>
-
 </body>
 </html>
